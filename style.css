@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+body{
+  width: 240px;
+  margin: 60px auto;
+  font-weight: bold;
+}
+th,td{
+  background-color: greenyellow;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  border: 2px solid white;
+}
