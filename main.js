@@ -1,37 +1,52 @@
 'use strict'
 {
-  const ceils = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
-  ]
-
   let rowNum = 3
   let colNum = 3
 
-  const makeBombPosition = (rowNum, colNum) => {
+  const div = document.querySelector('div')
+  //スタートボタンを連続で押した時に、セルが増えないようにした
+  const clearCeil = () => {
+    while (div.firstChild) {
+      div.removeChild(div.firstChild)
+    }
+  }
+
+  const setBombPosition = (rowNum, colNum) => {
+    //ceilsを関数内で定義することで、スタートを押すたびにリセットさせるようにした
+    const ceils = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ]
     const bombRowNum = Math.floor(Math.random() * rowNum)
     const bombColNum = Math.floor(Math.random() * colNum)
     ceils[bombRowNum][bombColNum] = '*'
+    makeCeil(ceils)
   }
+
+  const makeCeil = (ceils) => {
+    for (let row = 0; row < rowNum; row++) {
+      const tr = document.createElement('tr')
+      for (let col = 0; col < colNum; col++) {
+        const td = document.createElement('td')
+        td.textContent = ceils[row][col]
+        td.addEventListener('click', () => {
+          checkCeil(td)
+        })
+        tr.appendChild(td)
+      }
+      div.appendChild(tr)
+    }
+  }
+
   const start = document.createElement('button')
   start.textContent = 'START'
-  document.querySelector('div').appendChild(start)
+  document.querySelector('body').appendChild(start)
 
-  makeBombPosition(rowNum, colNum)
-
-  for (let row = 0; row < rowNum; row++) {
-    const tr = document.createElement('tr')
-    for (let col = 0; col < colNum; col++) {
-      const td = document.createElement('td')
-      td.textContent = ceils[row][col]
-      td.addEventListener('click', () => {
-        checkCeil(td)
-      })
-      tr.appendChild(td)
-    }
-    document.querySelector('div').appendChild(tr)
-  }
+  start.addEventListener('click', () => {
+    clearCeil()
+    setBombPosition(rowNum, colNum)
+  })
 
   let safeNum = 0
   const checkCeil = (td) => {
