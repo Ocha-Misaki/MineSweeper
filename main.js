@@ -42,16 +42,17 @@
   const start = document.createElement('button')
   start.textContent = 'START'
   document.querySelector('body').appendChild(start)
-
   start.addEventListener('click', () => {
     clearCeil()
+    safeNum = 0
     setBombPosition(rowNum, colNum)
   })
 
   let safeNum = 0
   const checkCeil = (td) => {
     if (td.textContent == '*') {
-      confirm('game over')
+      td.classList.add('out')
+      confirm('game over…')
     } else {
       td.classList.add('safe')
       safeNum++

@@ -15,3 +15,6 @@ th,td{
 td.safe{
   background-color: blue;
 }
+td.out{
+  background-color: red;
+}
