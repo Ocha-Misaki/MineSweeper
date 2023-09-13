@@ -13,15 +13,18 @@
 
   const setBombPosition = (rowNum, colNum) => {
     //ceilsを関数内で定義することで、スタートを押すたびにリセットさせるようにした
-    const ceils = [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ]
+    const ceils = []
+    for (let row = 0; row < rowNum; row++) {
+      ceils[row] = []
+      for (let col = 0; col < colNum; col++) {
+        ceils[row].push(new Ceil(row, col))
+      }
+    }
     const bombRowNum = Math.floor(Math.random() * rowNum)
     const bombColNum = Math.floor(Math.random() * colNum)
-    ceils[bombRowNum][bombColNum] = '*'
+    // ceils[bombRowNum][bombColNum] = '*'
     makeCeil(ceils)
+    console.log(ceils)
   }
 
   const makeCeil = (ceils) => {
@@ -29,7 +32,8 @@
       const tr = document.createElement('tr')
       for (let col = 0; col < colNum; col++) {
         const td = document.createElement('td')
-        td.textContent = ceils[row][col]
+        td.textContent = `${ceils[row][col].x} , ${ceils[row][col].y}`
+
         td.addEventListener('click', () => {
           checkCeil(td)
         })
@@ -60,6 +64,13 @@
 
     if (safeNum == 8) {
       confirm('game clear!')
+    }
+  }
+
+  class Ceil {
+    constructor(x, y) {
+      this.x = x
+      this.y = y
     }
   }
 }
