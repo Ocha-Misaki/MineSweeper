@@ -9,12 +9,7 @@ th,td{
   background-color: greenyellow;
   width: 40px;
   height: 40px;
+  line-height: 40px;
   text-align: center;
   border: 2px solid white;
-}
-td.safe{
-  background-color: blue;
-}
-td.out{
-  background-color: red;
 }
