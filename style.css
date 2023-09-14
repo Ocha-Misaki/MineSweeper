@@ -12,3 +12,9 @@ th,td{
   text-align: center;
   border: 2px solid white;
 }
+td.safe{
+  background-color: blue;
+}
+td.out{
+  background-color: red;
+}
