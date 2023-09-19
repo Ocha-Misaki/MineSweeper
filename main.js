@@ -32,12 +32,12 @@
   let rowNum = 3 //デフォルト
   let colNum = 3
   let bombNum = 1
-  const adjustLevel = (ceilNum, bombNum) => {
+  const adjustLevel = (ceilNum, _bombNum) => {
     rowNum = ceilNum
     colNum = ceilNum
-    bombNum = bombNum
+    bombNum = _bombNum
   }
-  adjustLevel(3, 1)
+  adjustLevel(3, 2)
 
   const ceils = []
   const makeCeils = (rowNum, colNum) => {
@@ -53,11 +53,17 @@
   }
 
   const setBomb = (ceils, bombNum) => {
-    const bombColNum = Math.floor(Math.random() * colNum)
-    const bombRowNum = Math.floor(Math.random() * rowNum)
-    for (let i = 0; i < bombNum; i++) {
-      // ceils[bombColNum][bombRowNum].bombFlag = true
-      ceils[0][2].bombFlag = true
+    let count = 0
+    while (true) {
+      const bombColNum = Math.floor(Math.random() * colNum)
+      const bombRowNum = Math.floor(Math.random() * rowNum)
+      if (ceils[bombColNum][bombRowNum].bombFlag == false) {
+        ceils[bombColNum][bombRowNum].bombFlag = true
+        count++
+      }
+      if (count == bombNum) {
+        break
+      }
     }
   }
 
@@ -82,7 +88,7 @@
         if (cx >= colNum || cy >= rowNum) {
           continue
         }
-        if (x == dx && y == dy) {
+        if (x == cx && y == cy) {
           continue
         }
         if (ceils[cx][cy].bombFlag) {
@@ -92,7 +98,7 @@
     }
     return results
   }
-  let isGameOver = false
+  let isGameOver = true
   const renderCeils = (ceils) => {
     for (let row = 0; row < rowNum; row++) {
       const tr = document.createElement('tr')
@@ -129,16 +135,19 @@
   const score = document.getElementById('score')
   const updateScore = () => {
     const elapsedTime = new Date(Date.now() - startTime)
-    const seconds = String(elapsedTime.getSeconds()).padStart(3, '0')
-    score.textContent = `🧭 ${seconds}`
+    const seconds = String(elapsedTime.getSeconds())
+    const milliSeconds = String(elapsedTime.getMilliseconds()).padStart(3, '0')
+    score.textContent = `${seconds}.${milliSeconds}`
   }
   const start = document.createElement('button')
   start.textContent = 'START'
   document.querySelector('body').appendChild(start)
   start.addEventListener('click', () => {
-    startTimer()
-    clearCeil()
-    isGameOver = false
-    makeCeils(rowNum, colNum)
+    if (isGameOver) {
+      startTimer()
+      clearCeil()
+      isGameOver = false
+      makeCeils(rowNum, colNum)
+    }
   })
 }
