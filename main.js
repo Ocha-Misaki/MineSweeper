@@ -10,7 +10,6 @@
     }
     open() {
       if (this.bombFlag === true) {
-        confirm('Game Over')
         this.element.textContent = '💣'
         this.element.style.backgroundColor = 'red'
       } else {
@@ -112,6 +111,9 @@
             stopTimer()
           }
           isGameOver = ceils[row][col].open()
+          if (isGameOver) {
+            confirm('Game Over')
+          }
         })
         tr.appendChild(td)
       }
