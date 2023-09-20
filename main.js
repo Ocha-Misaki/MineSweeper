@@ -1,4 +1,4 @@
-'use strict'
+"use strict"
 {
   class Ceil {
     constructor(x, y) {
@@ -6,154 +6,183 @@
       this.y = y
       this.bombFlag = false
       this.isOpen = false
-      this.text = ''
+      this.text = ""
     }
     open() {
       if (this.bombFlag === true) {
-        this.element.textContent = '💣'
-        this.element.style.backgroundColor = 'red'
+        this.element.textContent = "💣"
+        this.element.style.backgroundColor = "red"
       } else {
         this.element.textContent = this.text
-        this.element.style.backgroundColor = 'brown'
+        this.element.style.backgroundColor = "brown"
       }
       this.isOpen = true
       return this.bombFlag
     }
   }
 
-  const div = document.querySelector('div')
-  const clearCeil = () => {
-    while (div.firstChild) {
-      div.removeChild(div.firstChild)
+  class Timer {
+    constructor(elementId) {
+      this.startTime
+      this.intervalID
+      this.element = document.getElementById(elementId)
+    }
+    start = () => {
+      this.startTime = Date.now()
+      this.intervalID = setInterval(() => {
+        this.update()
+      }, 10)
+    }
+    stop = () => {
+      clearInterval(intervalID)
+      this.intervalID = undefined
+    }
+    update() {
+      const elapsedTime = new Date(Date.now() - this.startTime)
+      const seconds = String(elapsedTime.getSeconds())
+      const milliSeconds = String(elapsedTime.getMilliseconds()).padStart(
+        3,
+        "0"
+      )
+      this.element.textContent = `${seconds}.${milliSeconds}`
     }
   }
 
-  // Board クラス
-  // − Level
-  // - Ceilsの初期化、描画
-  let isGameOver = true
-  let rowNum = 3 //デフォルト
-  let colNum = 3
-  let bombNum = 1
-  const adjustLevel = (ceilNum, _bombNum) => {
-    rowNum = ceilNum
-    colNum = ceilNum
-    bombNum = _bombNum
-  }
-  adjustLevel(3, 2)
+  class Game {
+    constructor(elementId, level) {
+      this.boardElement = document.getElementById(elementId)
+      this.init(level)
+      this.makeCeils()
+      this.gameOver = true
+      this.ceils = []
+      this.timer = new Timer("score")
+    }
 
-  const ceils = []
-  const makeCeils = (rowNum, colNum) => {
-    for (let row = 0; row < rowNum; row++) {
-      ceils[row] = []
-      for (let col = 0; col < colNum; col++) {
-        ceils[row].push(new Ceil(col, row))
+    init(level) {
+      this.ceils = []
+      switch (level) {
+        case 1:
+          this.row = 5
+          this.col = 5
+          this.bombCount = 3
+
+          break
+
+        case 2:
+          this.row = 10
+          this.col = 10
+          this.bombCount = 10
+
+          break
+
+        default:
+          this.row = 3
+          this.col = 3
+          this.bombCount = 1
+          break
       }
     }
-    setBomb(ceils, bombNum)
-    setHints(ceils)
-    renderCeils(ceils)
-  }
-
-  const setBomb = (ceils, bombNum) => {
-    let count = 0
-    while (true) {
-      const bombColNum = Math.floor(Math.random() * colNum)
-      const bombRowNum = Math.floor(Math.random() * rowNum)
-      if (ceils[bombColNum][bombRowNum].bombFlag == false) {
-        ceils[bombColNum][bombRowNum].bombFlag = true
-        count++
-      }
-      if (count == bombNum) {
-        break
+    start() {
+      if (this.gameOver) {
+        this.timer.start()
+        this.clearCeil()
+        this.gameOver = false
+        this.makeCeils()
       }
     }
-  }
-
-  const setHints = (ceils) => {
-    for (let row = 0; row < rowNum; row++) {
-      for (let col = 0; col < colNum; col++) {
-        const count = checkAroundCeils(col, row).length
-        ceils[col][row].text = String(count)
+    clearCeil = () => {
+      while (this.boardElement.firstChild) {
+        this.boardElement.removeChild(this.boardElement.firstChild)
       }
     }
-  }
-
-  const checkAroundCeils = (x, y) => {
-    const results = []
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        const cx = x + dx
-        const cy = y + dy
-        if (cx < 0 || cy < 0) {
-          continue
+    makeCeils() {
+      for (let row = 0; row < this.row; row++) {
+        this.ceils[row] = []
+        for (let col = 0; col < this.col; col++) {
+          this.ceils[row].push(new Ceil(col, row))
         }
-        if (cx >= colNum || cy >= rowNum) {
-          continue
+      }
+      this.setBomb()
+      this.setHints()
+      this.renderCeils()
+    }
+
+    setBomb = () => {
+      let count = 0
+      while (true) {
+        const bombColNum = Math.floor(Math.random() * this.col)
+        const bombRowNum = Math.floor(Math.random() * this.row)
+        if (this.ceils[bombColNum][bombRowNum].bombFlag == false) {
+          this.ceils[bombColNum][bombRowNum].bombFlag = true
+          count++
         }
-        if (x == cx && y == cy) {
-          continue
-        }
-        if (ceils[cx][cy].bombFlag) {
-          results.push(ceils[cx][cy])
+        if (count == this.bombCount) {
+          break
         }
       }
     }
-    return results
-  }
-  const renderCeils = (ceils) => {
-    for (let row = 0; row < rowNum; row++) {
-      const tr = document.createElement('tr')
-      for (let col = 0; col < colNum; col++) {
-        const td = document.createElement('td')
-        ceils[row][col].element = td
-        td.addEventListener('click', () => {
-          if (isGameOver == true) {
-            return
-          } else if (ceils[row][col].bombFlag) {
-            stopTimer()
+
+    setHints = () => {
+      for (let row = 0; row < this.row; row++) {
+        for (let col = 0; col < this.col; col++) {
+          const count = this.checkAroundCeils(col, row).length
+          this.ceils[col][row].text = String(count)
+        }
+      }
+    }
+
+    checkAroundCeils = (x, y) => {
+      const results = []
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const cx = x + dx
+          const cy = y + dy
+          if (cx < 0 || cy < 0) {
+            continue
           }
-          isGameOver = ceils[row][col].open()
-          if (isGameOver) {
-            confirm('Game Over')
+          if (cx >= this.col || cy >= this.row) {
+            continue
           }
-        })
-        tr.appendChild(td)
+          if (x == cx && y == cy) {
+            continue
+          }
+          if (this.ceils[cx][cy].bombFlag) {
+            results.push(this.ceils[cx][cy])
+          }
+        }
       }
-      div.appendChild(tr)
+      return results
+    }
+    renderCeils = () => {
+      for (let row = 0; row < this.row; row++) {
+        const tr = document.createElement("tr")
+        for (let col = 0; col < this.col; col++) {
+          const td = document.createElement("td")
+          this.ceils[row][col].element = td
+          td.addEventListener("click", () => {
+            if (this.gameOver) {
+              return
+            } else if (this.ceils[row][col].bombFlag) {
+              this.timer.stop()
+            }
+            this.gameOver = this.ceils[row][col].open()
+            if (this.gameOver) {
+              confirm("Game Over")
+            }
+          })
+          tr.appendChild(td)
+        }
+        this.boardElement.appendChild(tr)
+      }
     }
   }
 
-  makeCeils(rowNum, colNum)
+  const game = new Game("content", 2)
 
-  let startTime
-  let intervalID
-  const startTimer = () => {
-    startTime = Date.now()
-    intervalID = setInterval(() => {
-      updateScore()
-    }, 10)
-  }
-  const stopTimer = () => {
-    clearInterval(intervalID)
-    intervalID = undefined
-  }
-  const score = document.getElementById('score')
-  const updateScore = () => {
-    const elapsedTime = new Date(Date.now() - startTime)
-    const seconds = String(elapsedTime.getSeconds())
-    const milliSeconds = String(elapsedTime.getMilliseconds()).padStart(3, '0')
-    score.textContent = `${seconds}.${milliSeconds}`
-  }
-  const start = document.createElement('button')
-  start.textContent = 'START'
-  document.querySelector('body').appendChild(start)
-  start.addEventListener('click', () => {
-    if (isGameOver) {
-      startTimer()
-      clearCeil()
-      isGameOver = false
-      makeCeils(rowNum, colNum)
-    }
+  const start = document.createElement("button")
+  start.textContent = "START"
+  document.querySelector("body").appendChild(start)
+  start.addEventListener("click", () => {
+    game.start()
   })
 }
