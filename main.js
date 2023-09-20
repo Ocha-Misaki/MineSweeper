@@ -28,6 +28,9 @@
     }
   }
 
+  // Board クラス
+  // − Level
+  // - Ceilsの初期化、描画
   let isGameOver = true
   let rowNum = 3 //デフォルト
   let colNum = 3
