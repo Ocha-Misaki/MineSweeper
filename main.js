@@ -1,4 +1,4 @@
-"use strict"
+'use strict'
 {
   class Ceil {
     constructor(x, y) {
@@ -6,15 +6,15 @@
       this.y = y
       this.bombFlag = false
       this.isOpen = false
-      this.text = ""
+      this.text = ''
     }
     open() {
       if (this.bombFlag === true) {
-        this.element.textContent = "💣"
-        this.element.style.backgroundColor = "red"
+        this.element.textContent = '💣'
+        this.element.style.backgroundColor = 'red'
       } else {
         this.element.textContent = this.text
-        this.element.style.backgroundColor = "brown"
+        this.element.style.backgroundColor = 'brown'
       }
       this.isOpen = true
       return this.bombFlag
@@ -34,17 +34,18 @@
       }, 10)
     }
     stop = () => {
-      clearInterval(intervalID)
+      clearInterval(this.intervalID)
       this.intervalID = undefined
     }
     update() {
       const elapsedTime = new Date(Date.now() - this.startTime)
-      const seconds = String(elapsedTime.getSeconds())
+      const minutes = String(elapsedTime.getMinutes()).padStart(2, '0')
+      const seconds = String(elapsedTime.getSeconds()).padStart(2, '0')
       const milliSeconds = String(elapsedTime.getMilliseconds()).padStart(
         3,
-        "0"
+        '0'
       )
-      this.element.textContent = `${seconds}.${milliSeconds}`
+      this.element.textContent = `${minutes}:${seconds}.${milliSeconds}`
     }
   }
 
@@ -54,8 +55,9 @@
       this.init(level)
       this.makeCeils()
       this.gameOver = true
+      this.hitsPoint
       this.ceils = []
-      this.timer = new Timer("score")
+      this.timer = new Timer('score')
     }
 
     init(level) {
@@ -65,14 +67,12 @@
           this.row = 5
           this.col = 5
           this.bombCount = 3
-
           break
 
         case 2:
           this.row = 10
           this.col = 10
           this.bombCount = 10
-
           break
 
         default:
@@ -155,21 +155,29 @@
     }
     renderCeils = () => {
       for (let row = 0; row < this.row; row++) {
-        const tr = document.createElement("tr")
+        const tr = document.createElement('tr')
         for (let col = 0; col < this.col; col++) {
-          const td = document.createElement("td")
+          const td = document.createElement('td')
           this.ceils[row][col].element = td
-          td.addEventListener("click", () => {
+          this.hitsPoint = this.row * this.col - this.bombCount
+          td.addEventListener('click', () => {
             if (this.gameOver) {
+              confirm('Game Over')
               return
-            } else if (this.ceils[row][col].bombFlag) {
+            } else if (this.ceils[row][col].bombFlag == true) {
               this.timer.stop()
             }
-            this.gameOver = this.ceils[row][col].open()
-            if (this.gameOver) {
-              confirm("Game Over")
+            if (this.hitsPoint == 0) {
+              confirm('Game Clear!')
+              return
             }
+            this.gameOver = this.ceils[row][col].open()
+            this.hitsPoint--
           })
+          if (this.gameOver) {
+            confirm('Game Over')
+            return
+          }
           tr.appendChild(td)
         }
         this.boardElement.appendChild(tr)
@@ -177,12 +185,12 @@
     }
   }
 
-  const game = new Game("content", 2)
+  const game = new Game('content')
 
-  const start = document.createElement("button")
-  start.textContent = "START"
-  document.querySelector("body").appendChild(start)
-  start.addEventListener("click", () => {
+  const start = document.createElement('button')
+  start.textContent = 'START'
+  document.querySelector('body').appendChild(start)
+  start.addEventListener('click', () => {
     game.start()
   })
 }
