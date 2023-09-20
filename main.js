@@ -133,6 +133,7 @@
   }
   const stopTimer = () => {
     clearInterval(intervalID)
+    intervalID = undefined
   }
   const score = document.getElementById('score')
   const updateScore = () => {
