@@ -28,6 +28,7 @@
     }
   }
 
+  let isGameOver = true
   let rowNum = 3 //デフォルト
   let colNum = 3
   let bombNum = 1
@@ -97,7 +98,6 @@
     }
     return results
   }
-  let isGameOver = true
   const renderCeils = (ceils) => {
     for (let row = 0; row < rowNum; row++) {
       const tr = document.createElement('tr')
