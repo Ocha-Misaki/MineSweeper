@@ -70,7 +70,7 @@
     for (let row = 0; row < rowNum; row++) {
       for (let col = 0; col < colNum; col++) {
         let count = checkAroundCeils(col, row).length
-        ceils[col][row].text = `${count}`
+        ceils[col][row].text = String(count)
       }
     }
   }
