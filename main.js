@@ -70,14 +70,14 @@
   const setHints = (ceils) => {
     for (let row = 0; row < rowNum; row++) {
       for (let col = 0; col < colNum; col++) {
-        let count = checkAroundCeils(col, row).length
+        const count = checkAroundCeils(col, row).length
         ceils[col][row].text = String(count)
       }
     }
   }
 
   const checkAroundCeils = (x, y) => {
-    let results = []
+    const results = []
     for (let dy = -1; dy <= 1; dy++) {
       for (let dx = -1; dx <= 1; dx++) {
         const cx = x + dx
