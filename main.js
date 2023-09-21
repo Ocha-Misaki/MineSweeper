@@ -55,7 +55,7 @@
       this.init(level)
       this.makeCeils()
       this.gameOver = true
-      this.hitsPoint
+      this.hitsPoint = 0
       this.ceils = []
       this.timer = new Timer('score')
     }
@@ -70,9 +70,9 @@
           break
 
         case 2:
-          this.row = 10
-          this.col = 10
-          this.bombCount = 10
+          this.row = 7
+          this.col = 7
+          this.bombCount = 5
           break
 
         default:
@@ -185,7 +185,7 @@
     }
   }
 
-  const game = new Game('content')
+  const game = new Game('content', 1)
 
   const start = document.createElement('button')
   start.textContent = 'START'
