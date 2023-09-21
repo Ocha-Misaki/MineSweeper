@@ -159,25 +159,32 @@
         for (let col = 0; col < this.col; col++) {
           const td = document.createElement('td')
           this.ceils[row][col].element = td
+
           this.hitsPoint = this.row * this.col - this.bombCount
+
           td.addEventListener('click', () => {
             if (this.gameOver) {
               confirm('Game Over')
               return
-            } else if (this.ceils[row][col].bombFlag == true) {
-              this.timer.stop()
             }
             if (this.hitsPoint == 0) {
-              confirm('Game Clear!')
               return
             }
+
             this.gameOver = this.ceils[row][col].open()
+            if (this.gameOver) {
+              confirm('Game Over')
+              this.timer.stop()
+              return
+            }
             this.hitsPoint--
+            if (this.hitsPoint == 0) {
+              confirm('Game Clear!')
+              this.timer.stop()
+              return
+            }
           })
-          if (this.gameOver) {
-            confirm('Game Over')
-            return
-          }
+
           tr.appendChild(td)
         }
         this.boardElement.appendChild(tr)
@@ -185,7 +192,7 @@
     }
   }
 
-  const game = new Game('content', 1)
+  const game = new Game('content')
 
   const start = document.createElement('button')
   start.textContent = 'START'
