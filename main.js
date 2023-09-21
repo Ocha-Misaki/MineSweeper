@@ -27,13 +27,13 @@
       this.intervalID
       this.element = document.getElementById(elementId)
     }
-    start = () => {
+    start() {
       this.startTime = Date.now()
       this.intervalID = setInterval(() => {
         this.update()
       }, 10)
     }
-    stop = () => {
+    stop() {
       clearInterval(this.intervalID)
       this.intervalID = undefined
     }
@@ -90,7 +90,7 @@
         this.makeCeils()
       }
     }
-    clearCeil = () => {
+    clearCeil() {
       while (this.boardElement.firstChild) {
         this.boardElement.removeChild(this.boardElement.firstChild)
       }
@@ -107,7 +107,7 @@
       this.renderCeils()
     }
 
-    setBomb = () => {
+    setBomb() {
       let count = 0
       while (true) {
         const bombColNum = Math.floor(Math.random() * this.col)
@@ -131,7 +131,7 @@
       }
     }
 
-    checkAroundCeils = (x, y) => {
+    checkAroundCeils(x, y) {
       const results = []
       for (let dy = -1; dy <= 1; dy++) {
         for (let dx = -1; dx <= 1; dx++) {
@@ -153,7 +153,7 @@
       }
       return results
     }
-    renderCeils = () => {
+    renderCeils() {
       for (let row = 0; row < this.row; row++) {
         const tr = document.createElement('tr')
         for (let col = 0; col < this.col; col++) {
