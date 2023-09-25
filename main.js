@@ -58,6 +58,7 @@
       this.hitsPoint = 0
       this.ceils = []
       this.timer = new Timer('score')
+      this.openTarget = []
     }
 
     init(level) {
@@ -108,51 +109,57 @@
     }
 
     setBomb() {
-      let count = 0
-      while (true) {
-        const bombColNum = Math.floor(Math.random() * this.col)
-        const bombRowNum = Math.floor(Math.random() * this.row)
-        if (this.ceils[bombColNum][bombRowNum].bombFlag == false) {
-          this.ceils[bombColNum][bombRowNum].bombFlag = true
-          count++
-        }
-        if (count == this.bombCount) {
-          break
-        }
-      }
+      this.ceils[0][0].bombFlag = true
+      this.ceils[4][4].bombFlag = true
+      this.ceils[2][2].bombFlag = true
+      // let count = 0
+      // while (true) {
+      //   const bombColNum = Math.floor(Math.random() * this.col)
+      //   const bombRowNum = Math.floor(Math.random() * this.row)
+      //   if (this.ceils[bombColNum][bombRowNum].bombFlag == false) {
+
+      //     // this.ceils[bombColNum][bombRowNum].bombFlag = true
+      //     count++
+      //   }
+      //   if (count == this.bombCount) {
+      //     break
+      //   }
+      // }
     }
 
     setHints = () => {
       for (let row = 0; row < this.row; row++) {
         for (let col = 0; col < this.col; col++) {
-          const count = this.checkAroundCeils(col, row).length
+          const count = this.checkAroundBombs(col, row).length
           this.ceils[col][row].text = String(count)
+          this.checkAroundCeils(col, row)
         }
       }
     }
 
-    checkAroundCeils(x, y) {
-      const results = []
+    checkAroundBombs(x, y) {
+      const bombs = []
       for (let dy = -1; dy <= 1; dy++) {
         for (let dx = -1; dx <= 1; dx++) {
-          const cx = x + dx
-          const cy = y + dy
-          if (cx < 0 || cy < 0) {
+          const bx = x + dx
+          const by = y + dy
+          if (bx < 0 || by < 0) {
             continue
           }
-          if (cx >= this.col || cy >= this.row) {
+          if (bx >= this.col || by >= this.row) {
             continue
           }
-          if (x == cx && y == cy) {
+          if (x == bx && y == by) {
             continue
           }
-          if (this.ceils[cx][cy].bombFlag) {
-            results.push(this.ceils[cx][cy])
+          if (this.ceils[bx][by].bombFlag) {
+            bombs.push(this.ceils[bx][by])
           }
         }
       }
-      return results
+      return bombs
     }
+
     renderCeils() {
       for (let row = 0; row < this.row; row++) {
         const tr = document.createElement('tr')
@@ -171,18 +178,8 @@
               return
             }
 
-            this.gameOver = this.ceils[row][col].open()
-            if (this.gameOver) {
-              confirm('Game Over')
-              this.timer.stop()
-              return
-            }
-            this.hitsPoint--
-            if (this.hitsPoint == 0) {
-              confirm('Game Clear!')
-              this.timer.stop()
-              return
-            }
+            this.openTarget.push([col, row])
+            this.open()
           })
 
           tr.appendChild(td)
@@ -190,9 +187,58 @@
         this.boardElement.appendChild(tr)
       }
     }
+    open() {
+      while (this.openTarget.length) {
+        const [x, y] = this.openTarget.pop()
+        this.gameOver = this.ceils[y][x].open()
+        if (this.gameOver) {
+          confirm('Game Over')
+          this.timer.stop()
+          return
+        }
+        this.hitsPoint--
+        if (this.hitsPoint == 0) {
+          confirm('Game Clear!')
+          this.timer.stop()
+          return
+        }
+
+        let counter = 0
+        const target = []
+        for (let vy = -1; vy <= 1; vy++) {
+          for (let bx = -1; bx <= 1; bx++) {
+            const cx = x + bx
+            const cy = y + vy
+            if (cx < 0 || cy < 0) {
+              continue
+            }
+            if (cx >= this.col || cy >= this.row) {
+              continue
+            }
+            if (x == cx && y == cy) {
+              continue
+            }
+            const ceil = this.ceils[cy][cx]
+            if (ceil.isOpen == true) {
+              continue
+            }
+
+            if (ceil.bombFlag == true) {
+              counter++
+            } else {
+              target.push([cx, cy])
+            }
+          }
+        }
+        if (counter == 0) {
+          this.openTarget.push(...target)
+        }
+        // debugger
+      }
+    }
   }
 
-  const game = new Game('content')
+  const game = new Game('content', 1)
 
   const start = document.createElement('button')
   start.textContent = 'START'
